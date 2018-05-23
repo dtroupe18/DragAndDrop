@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:DrapAndDrop.xcodeproj">
+      location = "self:/Users/Dave/Documents/iOS_Applications/DrapAndDrop/DragAndDrop.xcodeproj">
    </FileRef>
 </Workspace>
