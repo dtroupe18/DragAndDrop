@@ -30,6 +30,7 @@ struct Model {
     //
     mutating func moveItem(at startIndex: Int, to endIndex: Int) {
         if startIndex != endIndex {
+            print("move item fired...")
             let planet = planets[startIndex]
             planets.remove(at: startIndex)
             planets.insert(planet, at: endIndex)

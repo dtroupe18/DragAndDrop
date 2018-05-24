@@ -10,10 +10,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Drag and Drop-->
+        <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="DrapAndDrop" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="DragAndDrop" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -38,16 +38,23 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Drag and Drop" id="rbD-Qx-wfU">
+                    <navigationItem key="navigationItem" id="rbD-Qx-wfU">
                         <barButtonItem key="leftBarButtonItem" title="TableView" id="gLE-bP-hE6">
                             <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <connections>
                                 <action selector="pressedTableViewButton:" destination="BYZ-38-t0r" id="ss1-aa-u6h"/>
                             </connections>
                         </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="CollectionView" id="sX4-os-0R1">
+                            <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <connections>
+                                <action selector="pressedCollectionView:" destination="BYZ-38-t0r" id="jZA-zE-JR3"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="bottomImageView" destination="cB2-kX-sNu" id="Icf-hG-gRf"/>
+                        <outlet property="collectionViewButton" destination="sX4-os-0R1" id="gqI-0S-dgt"/>
                         <outlet property="tableViewButton" destination="gLE-bP-hE6" id="szm-Yb-SdU"/>
                         <outlet property="topImageView" destination="Flt-3m-WhY" id="L3F-2R-ftb"/>
                     </connections>

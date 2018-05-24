@@ -15,6 +15,7 @@ class ViewController: UIViewController, UIDropInteractionDelegate, UIDragInterac
     @IBOutlet weak var topImageView: UIImageView!
     @IBOutlet weak var bottomImageView: UIImageView!
     @IBOutlet weak var tableViewButton: UIBarButtonItem!
+    @IBOutlet weak var collectionViewButton: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -89,7 +90,13 @@ class ViewController: UIViewController, UIDropInteractionDelegate, UIDragInterac
         }
     }
     
-
+    @IBAction func pressedCollectionView(_ sender: UIBarButtonItem) {
+        let sb: UIStoryboard = UIStoryboard(name: "CollectionViewDragDrop", bundle: nil)
+        if let vc = sb.instantiateViewController(withIdentifier: "CollectionDragDropVC") as? CollectionDragDropViewController {
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
