@@ -9,7 +9,7 @@
 import UIKit
 import MobileCoreServices
 
-struct Model {
+struct TableViewModel {
     
     // Makes the setter for the var private, but the getter remains public
     //
@@ -30,7 +30,6 @@ struct Model {
     //
     mutating func moveItem(at startIndex: Int, to endIndex: Int) {
         if startIndex != endIndex {
-            print("move item fired...")
             let planet = planets[startIndex]
             planets.remove(at: startIndex)
             planets.insert(planet, at: endIndex)

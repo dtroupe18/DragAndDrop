@@ -11,7 +11,7 @@ import MobileCoreServices
 
 class TableViewDragDropController: UITableViewController {
     
-    var model = Model()
+    var model = TableViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,6 +62,8 @@ extension TableViewDragDropController: UITableViewDragDelegate {
     }
 }
 
+// Drop Delegate
+//
 extension TableViewDragDropController: UITableViewDropDelegate {
     
     func tableView(_ tableView: UITableView, canHandle session: UIDropSession) -> Bool {
@@ -75,13 +77,11 @@ extension TableViewDragDropController: UITableViewDropDelegate {
             } else {
                 // .move is only available for dragging within a single app
                 //
-                print("return move")
                 return UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
             }
         } else {
             // Multi-tasking drag which allows more than one string to be added
             //
-            print("using copy....")
             return UITableViewDropProposal(operation: .copy, intent: .insertAtDestinationIndexPath)
         }
     }

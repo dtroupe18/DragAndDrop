@@ -56,7 +56,7 @@ class ViewController: UIViewController, UIDropInteractionDelegate, UIDragInterac
         for dragItem in session.items {
             dragItem.itemProvider.loadObject(ofClass: UIImage.self, completionHandler: { object, error in
                 guard error == nil else { return print("Failed to load our dragged item") }
-                guard let draggedImage = object as? UIImage else { print("3"); return }
+                guard let draggedImage = object as? UIImage else { print("object not UIImage"); return }
 
                 DispatchQueue.main.async {
                     if session.location(in: self.view).y <= self.topImageView.frame.maxY {

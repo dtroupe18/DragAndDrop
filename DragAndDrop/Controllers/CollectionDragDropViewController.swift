@@ -1,94 +1,194 @@
 //
-//  CollectionDragDropViewController.swift
+//  CollectionViewController.swift
 //  DragAndDrop
 //
-//  Created by Dave on 5/23/18.
+//  Created by Dave on 5/24/18.
 //  Copyright © 2018 High Tree Development. All rights reserved.
 //
 
 import UIKit
+import MobileCoreServices
 
-private let reuseIdentifier = "Cell"
-
-class CollectionDragDropViewController: UICollectionViewController {
-
+class CollectionDragDropViewController: UIViewController {
+    
+    @IBOutlet var collectionView: UICollectionView!
+    
+    var model = CollectionViewModel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Register cell classes
-        self.collectionView!.register(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
-
-        // Do any additional setup after loading the view.
+        
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.dropDelegate = self
+        collectionView.dragDelegate = self
+        collectionView.dragInteractionEnabled = true
+        
+        // Register the Xib for our cell
+        //
+        let nib = UINib.init(nibName: "ImageCell", bundle: nil)
+        collectionView.register(nib, forCellWithReuseIdentifier: "Cell")
+        
+        if let flow = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            flow.sectionInset = UIEdgeInsetsMake(0, 0, 0, 0)
+            let width = UIScreen.main.bounds.size.width
+            // let height = UIScreen.main.bounds.size.height
+            flow.itemSize = CGSize(width: width / 2.0, height: width / 2.0)
+            flow.minimumInteritemSpacing = 0
+            flow.minimumLineSpacing = 0
+        }
     }
-
+    
+    // This method moves a cell from source indexPath to destination indexPath within the same collection view.
+    // It works for only 1 item. If multiple items selected, no reordering happens.
+    //
+    private func reorderItems(coordinator: UICollectionViewDropCoordinator, destinationIndexPath: IndexPath, collectionView: UICollectionView) {
+        
+        let items = coordinator.items
+        if items.count == 1, let item = items.first, let sourceIndexPath = item.sourceIndexPath {
+            var dIndexPath = destinationIndexPath
+            if dIndexPath.row >= collectionView.numberOfItems(inSection: 0) {
+                dIndexPath.row = collectionView.numberOfItems(inSection: 0) - 1
+            }
+            
+            collectionView.performBatchUpdates({
+                
+                // self.items2.remove(at: sourceIndexPath.row)
+                // self.items2.insert(item.dragItem.localObject as! String, at: dIndexPath.row)
+                
+                
+                collectionView.deleteItems(at: [sourceIndexPath])
+                collectionView.insertItems(at: [dIndexPath])
+            })
+            
+            coordinator.drop(items.first!.dragItem, toItemAt: dIndexPath)
+        }
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
+}
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
-    }
-    */
-
-    // MARK: UICollectionViewDataSource
-
-    override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
-    }
-
-
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of items
-        return 0
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
+// ColelctionView datasource and delegate
+//
+extension CollectionDragDropViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
-        // Configure the cell
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
     
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return model.planets.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! ImageCell
+        cell.imageView.image = model.planets[indexPath.row]
+        cell.layer.borderWidth = 1.0
+        cell.layer.borderColor = UIColor.white.cgColor
         return cell
     }
-
-    // MARK: UICollectionViewDelegate
-
-    /*
-    // Uncomment this method to specify if the specified item should be highlighted during tracking
-    override func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment this method to specify if the specified item should be selected
-    override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-    override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
-        return false
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
-        return false
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
     
+    func collectionView(_ collectionView: UICollectionView, canMoveItemAt indexPath: IndexPath) -> Bool {
+        return true
     }
-    */
+    
+    func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        model.moveItem(at: sourceIndexPath.row, to: destinationIndexPath.row)
+    }
+    
+    // Recalculate cell size on orientation change
+    //
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        guard let flow = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else {
+            return
+        }
+        flow.invalidateLayout()
+        flow.sectionInset = UIEdgeInsetsMake(0, 0, 0, 0)
+        let width = UIScreen.main.bounds.size.width
+        flow.itemSize = CGSize(width: width / 2.0, height: width / 2.0)
+        flow.minimumInteritemSpacing = 0
+        flow.minimumLineSpacing = 0
+    }
+}
 
+// Drag delegate
+//
+extension CollectionDragDropViewController: UICollectionViewDragDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        return model.dragItem(for: indexPath)
+    }
+}
+
+// Drop delegate
+//
+extension CollectionDragDropViewController: UICollectionViewDropDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, canHandle session: UIDropSession) -> Bool {
+        return model.canHandle(session)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+        
+        if collectionView.hasActiveDrag {
+            if session.items.count > 1 {
+                return UICollectionViewDropProposal(operation: .cancel)
+            } else {
+                // .move is only available for dragging within a single app
+                //
+                return UICollectionViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
+            }
+        } else {
+            // Multi-tasking drag which allows more than image string to be added
+            //
+            return UICollectionViewDropProposal(operation: .copy, intent: .insertAtDestinationIndexPath)
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+        
+        let destinationIndexPath: IndexPath
+        
+        if let indexPath = coordinator.destinationIndexPath {
+            destinationIndexPath = indexPath
+        } else {
+            // Use the last indexPath of the collectionView
+            //
+            let section = collectionView.numberOfSections - 1
+            let row = collectionView.numberOfItems(inSection: section)
+            destinationIndexPath = IndexPath(row: row, section: section)
+        }
+        
+        
+        let items = coordinator.items
+        for item in items {
+            
+            if let sourceIndexPath = item.sourceIndexPath, coordinator.proposal.operation == .move {
+                // .move operation
+                //
+                collectionView.performBatchUpdates({
+                    model.moveItem(at: sourceIndexPath.row, to: destinationIndexPath.row)
+                    collectionView.deleteItems(at: [sourceIndexPath])
+                    collectionView.insertItems(at: [destinationIndexPath])
+                })
+                coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
+            } else if coordinator.proposal.operation == .copy {
+                item.dragItem.itemProvider.loadObject(ofClass: UIImage.self, completionHandler: { (newImage, error) in
+                    if let image = newImage as? UIImage {
+                        
+                        if coordinator.proposal.operation == .copy {
+                            self.model.addPlanet(image, at: destinationIndexPath.row)
+                            DispatchQueue.main.async {
+                                collectionView.insertItems(at: [destinationIndexPath])
+                            }
+                        } else if coordinator.proposal.operation == .move {
+                            
+                        }
+                    }
+                })
+            }
+        }
+    }
 }
